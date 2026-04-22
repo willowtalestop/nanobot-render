@@ -1,5 +1,5 @@
 services:
-  - type: web # Changed from worker to web
+  - type: web
     name: automatte-nanobot
     runtime: docker
     plan: free
@@ -10,8 +10,8 @@ services:
       - key: NVIDIA_API_KEY
         sync: false
       - key: NANOBOT_MODEL
-        value: "nvidia/llama-3.1-8b-instruct"
+        value: "qwen/qwen3.5-397b-a17b" # Updated Model
       - key: RCLONE_CONFIG_BASE64
         sync: false
-      - key: PORT # Render requires the app to listen on a port
+      - key: PORT
         value: "10000"
