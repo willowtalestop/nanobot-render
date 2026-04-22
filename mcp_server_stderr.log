@@ -14,3 +14,14 @@ EARLY: argv=['D:\\Projects\\mcp_fin\\mcp_fin\\server.py']
 EARLY: module import reached
 EARLY: sys.executable=D:\Projects\mcp_fin\.venv\Scripts\python.exe
 EARLY: argv=['D:\\Projects\\mcp_fin\\mcp_fin\\server.py']
+2026-04-22 15:45:13,820 [INFO] mcp_fin.server: mcp-fin-server: main_entry entered
+2026-04-22 15:45:13,827 [INFO] mcp_fin.server: mcp-fin-server: _async_main entered
+2026-04-22 15:45:13,827 [INFO] mcp_fin.server: mcp-fin-server: starting stdio transport
+2026-04-22 15:45:13,827 [INFO] mcp_fin.server: mcp-fin-server: stdin type=<class '_io.TextIOWrapper'>, stdin.buffer type=<class '_io.BufferedReader'>
+2026-04-22 15:45:13,827 [INFO] mcp_fin.server: mcp-fin-server: stdout type=<class '_io.TextIOWrapper'>, stdout.buffer type=<class '_io.FileIO'>
+2026-04-22 15:45:13,879 [INFO] mcp_fin.server: mcp-fin-server: stdio connected
+2026-04-22 15:45:13,880 [INFO] mcp_fin.server: mcp-fin-server: DIAG_BLOCK waiting before app.run (up to 20s)
+2026-04-22 15:45:33,876 [INFO] mcp_fin.server: mcp-fin-server: DIAG_BLOCK timeout reached; continuing to app.run
+2026-04-22 15:45:33,876 [INFO] mcp_fin.server: mcp-fin-server: launching app.run
+2026-04-22 15:45:33,890 [INFO] mcp.server.lowlevel.server: Processing request of type ListToolsRequest
+2026-04-22 15:45:33,906 [INFO] mcp.server.lowlevel.server: Processing request of type ListPromptsRequest
