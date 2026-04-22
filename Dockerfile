@@ -1,33 +1,35 @@
 FROM python:3.12-slim
 
-# Install dependencies
+USER root
 RUN apt-get update && apt-get install -y \
-    curl git jq sudo unzip \
+    curl git jq sudo unzip procps \
     && curl https://rclone.org/install.sh | sudo bash \
     && rm -rf /var/lib/apt/lists/*
 
-# Create user
-RUN useradd -m -u 1000 user
+RUN useradd -m -u 1000 user && \
+    echo "user ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 WORKDIR /home/user/app
 
-# Install Nanobot
 RUN pip install --no-cache-dir nanobot-ai
 
-# Build the startup script
 COPY <<-"EOF" /home/user/app/start.sh
 #!/bin/bash
 set -e
 
-# Initialize Rclone
+# 1. Start a tiny background web server to keep Render happy
+# This listens on the port Render expects (default 10000)
+python3 -m http.server ${PORT:-10000} &
+
+# 2. Rclone Configuration
 if [ -n "$RCLONE_CONFIG_BASE64" ]; then
+    echo "Configuring rclone..."
     echo "$RCLONE_CONFIG_BASE64" | tr -dc 'A-Za-z0-9+/=' | base64 -d > /home/user/rclone.conf
 fi
 
-# Setup Nanobot Workspace
+# 3. Nanobot Setup
 mkdir -p /home/user/.nanobot/workspace/memory
 echo "You are a professional AI assistant for Automatte Asia." > /home/user/.nanobot/workspace/SOUL.md
 
-# Create Config
 cat <<CONF > /home/user/.nanobot/config.json
 {
   "agents": {
@@ -53,6 +55,7 @@ cat <<CONF > /home/user/.nanobot/config.json
 }
 CONF
 
+echo "Starting Nanobot Gateway..."
 exec nanobot gateway
 EOF
 
