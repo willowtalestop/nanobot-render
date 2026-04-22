@@ -1,0 +1,15 @@
+services:
+  - type: worker
+    name: automatte-nanobot
+    runtime: docker
+    plan: free # Or your preferred plan
+    region: singapore # Choose the region closest to you (e.g., Singapore for Malaysia)
+    envVars:
+      - key: TELEGRAM_TOKEN
+        sync: false
+      - key: NVIDIA_API_KEY
+        sync: false
+      - key: NANOBOT_MODEL
+        value: "nvidia/llama-3.1-8b-instruct"
+      - key: RCLONE_CONFIG_BASE64
+        sync: false
