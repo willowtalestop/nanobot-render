@@ -10,7 +10,7 @@ services:
       - key: NVIDIA_API_KEY
         sync: false
       - key: NANOBOT_MODEL
-        value: "qwen/qwen3.5-397b-a17b" # Updated Model
+        value: "minimaxai/minimax-m2.7" # Switched to MiniMax for speed
       - key: RCLONE_CONFIG_BASE64
         sync: false
       - key: PORT

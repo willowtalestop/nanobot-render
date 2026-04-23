@@ -2,11 +2,17 @@ FROM python:3.12-slim
 
 USER root
 
+# 1. Install System Dependencies + Node.js 20 (LTS)
 RUN apt-get update && apt-get install -y \
-    curl git jq sudo unzip procps \
+    curl git jq sudo unzip procps ca-certificates gnupg \
+    && mkdir -p /etc/apt/keyrings \
+    && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
+    && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_20.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list \
+    && apt-get update && apt-get install -y nodejs \
     && curl https://rclone.org/install.sh | sudo bash \
     && rm -rf /var/lib/apt/lists/*
 
+# 2. Setup User
 RUN useradd -m -u 1000 user && \
     echo "user ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 RUN mkdir -p /home/user/.nanobot /home/user/app \
@@ -14,16 +20,18 @@ RUN mkdir -p /home/user/.nanobot /home/user/app \
 
 WORKDIR /home/user/app
 
+# 3. Install Nanobot (Python)
 RUN pip install --no-cache-dir nanobot-ai
 
+# 4. Startup Script
 COPY <<EOF /home/user/app/start.sh
 #!/bin/bash
 set -e
 
-# Capture the model from ENV or fallback to qwen3.5 if empty
-CURRENT_MODEL="\${NANOBOT_MODEL:-qwen/qwen3.5-397b-a17b}"
+# Capture the model - Now defaulting to MiniMax
+CURRENT_MODEL="\${NANOBOT_MODEL:-minimaxai/minimax-m2.7}"
 
-# 1. Dashboard with Dynamic Model Variable
+# Dashboard HTML
 cat <<HTML > /home/user/app/index.html
 <!DOCTYPE html>
 <html lang="en">
@@ -38,8 +46,7 @@ cat <<HTML > /home/user/app/index.html
         .status-badge { display: inline-flex; align-items: center; background: rgba(35, 134, 54, 0.1); color: #3fb950; padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; margin-bottom: 2rem; border: 1px solid rgba(63, 185, 80, 0.3); }
         .pulse { width: 8px; height: 8px; background: #3fb950; border-radius: 50%; margin-right: 8px; animation: pulse 2s infinite; }
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(63, 185, 80, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(63, 185, 80, 0); } 100% { box-shadow: 0 0 0 0 rgba(63, 185, 80, 0); } }
-        .model-info { background: #0d1117; padding: 1rem; border-radius: 8px; font-family: 'SFMono-Regular', Consolas, monospace; font-size: 0.85rem; color: #79c0ff; border: 1px solid #30363d; word-break: break-all; }
-        .label { color: #8b949e; display: block; font-size: 0.7rem; text-transform: uppercase; margin-bottom: 5px; }
+        .model-info { background: #0d1117; padding: 1rem; border-radius: 8px; font-family: monospace; font-size: 0.85rem; color: #79c0ff; border: 1px solid #30363d; word-break: break-all; }
         .footer { margin-top: 2rem; font-size: 0.75rem; color: #484f58; }
     </style>
 </head>
@@ -47,9 +54,9 @@ cat <<HTML > /home/user/app/index.html
     <div class="container">
         <div class="status-badge"><div class="pulse"></div> Gateway Active</div>
         <div class="logo">Automatte Nanobot</div>
-        <p style="color: #8b949e; margin-bottom: 2rem;">Automation node is online and synchronized.</p>
+        <p style="color: #8b949e; margin-bottom: 2rem;">Turbo Mode: Enabled</p>
         <div class="model-info">
-            <span class="label">Active Engine</span>
+            <div style="font-size: 0.65rem; color: #8b949e; margin-bottom: 4px; text-transform: uppercase;">Active Engine</div>
             \$CURRENT_MODEL
         </div>
         <div class="footer">&copy; 2026 Automatte Asia</div>
@@ -58,15 +65,15 @@ cat <<HTML > /home/user/app/index.html
 </html>
 HTML
 
-# 2. Start Health Check server
+# Start health server
 python3 -m http.server \${PORT:-10000} &
 
-# 3. Rclone
+# Rclone
 if [ -n "\$RCLONE_CONFIG_BASE64" ]; then
     echo "\$RCLONE_CONFIG_BASE64" | tr -dc 'A-Za-z0-9+/=' | base64 -d > /home/user/rclone.conf
 fi
 
-# 4. Workspace & Config (Dynamic Model Injection)
+# Workspace/Config
 mkdir -p /home/user/.nanobot/workspace/memory
 cat <<CONF > /home/user/.nanobot/config.json
 {
@@ -93,7 +100,7 @@ cat <<CONF > /home/user/.nanobot/config.json
 }
 CONF
 
-echo "Engine initialized: \$CURRENT_MODEL"
+echo "Gateway initialized with \$CURRENT_MODEL"
 exec nanobot gateway
 EOF
 
