@@ -66,3 +66,40 @@ EARLY: argv=['D:\\Projects\\mcp_fin\\mcp_fin\\server.py']
 EARLY: module import reached
 EARLY: sys.executable=D:\Projects\mcp_fin\.venv\Scripts\python.exe
 EARLY: argv=['D:\\Projects\\mcp_fin\\mcp_fin\\server.py']
+2026-04-23 22:32:02,018 [INFO] mcp_fin.server: mcp-fin-server: main_entry entered
+2026-04-23 22:32:02,020 [INFO] mcp_fin.server: mcp-fin-server: _async_main entered
+2026-04-23 22:32:02,020 [INFO] mcp_fin.server: mcp-fin-server: starting stdio transport
+2026-04-23 22:32:02,020 [INFO] mcp_fin.server: mcp-fin-server: stdin type=<class '_io.TextIOWrapper'>, stdin.buffer type=<class '_io.BufferedReader'>
+2026-04-23 22:32:02,020 [INFO] mcp_fin.server: mcp-fin-server: stdout type=<class '_io.TextIOWrapper'>, stdout.buffer type=<class '_io.FileIO'>
+2026-04-23 22:32:02,041 [INFO] mcp_fin.server: mcp-fin-server: stdio connected
+2026-04-23 22:32:02,041 [INFO] mcp_fin.server: mcp-fin-server: DIAG_BLOCK waiting before app.run (up to 20s)
+EARLY: module import reached
+EARLY: sys.executable=D:\Projects\mcp_fin\.venv\Scripts\python.exe
+EARLY: argv=['D:\\Projects\\mcp_fin\\mcp_fin\\server.py']
+2026-04-23 22:32:10,214 [INFO] mcp_fin.server: mcp-fin-server: main_entry entered
+2026-04-23 22:32:10,217 [INFO] mcp_fin.server: mcp-fin-server: _async_main entered
+2026-04-23 22:32:10,217 [INFO] mcp_fin.server: mcp-fin-server: starting stdio transport
+2026-04-23 22:32:10,217 [INFO] mcp_fin.server: mcp-fin-server: stdin type=<class '_io.TextIOWrapper'>, stdin.buffer type=<class '_io.BufferedReader'>
+2026-04-23 22:32:10,217 [INFO] mcp_fin.server: mcp-fin-server: stdout type=<class '_io.TextIOWrapper'>, stdout.buffer type=<class '_io.FileIO'>
+2026-04-23 22:32:10,233 [INFO] mcp_fin.server: mcp-fin-server: stdio connected
+2026-04-23 22:32:10,233 [INFO] mcp_fin.server: mcp-fin-server: DIAG_BLOCK waiting before app.run (up to 20s)
+2026-04-23 22:32:22,049 [INFO] mcp_fin.server: mcp-fin-server: DIAG_BLOCK timeout reached; continuing to app.run
+2026-04-23 22:32:22,049 [INFO] mcp_fin.server: mcp-fin-server: launching app.run
+2026-04-23 22:32:22,063 [INFO] mcp.server.lowlevel.server: Processing request of type ListToolsRequest
+2026-04-23 22:32:22,076 [INFO] mcp.server.lowlevel.server: Processing request of type ListPromptsRequest
+2026-04-23 22:32:30,239 [INFO] mcp_fin.server: mcp-fin-server: DIAG_BLOCK timeout reached; continuing to app.run
+2026-04-23 22:32:30,345 [INFO] mcp_fin.server: mcp-fin-server: launching app.run
+2026-04-23 22:32:30,355 [INFO] mcp.server.lowlevel.server: Processing request of type ListToolsRequest
+EARLY: module import reached
+EARLY: sys.executable=D:\Projects\mcp_fin\.venv\Scripts\python.exe
+EARLY: argv=['D:\\Projects\\mcp_fin\\mcp_fin\\server.py']
+2026-04-23 23:39:31,260 [INFO] mcp_fin.server: mcp-fin-server: main_entry entered
+2026-04-23 23:39:31,263 [INFO] mcp_fin.server: mcp-fin-server: _async_main entered
+2026-04-23 23:39:31,263 [INFO] mcp_fin.server: mcp-fin-server: starting stdio transport
+2026-04-23 23:39:31,263 [INFO] mcp_fin.server: mcp-fin-server: stdin type=<class '_io.TextIOWrapper'>, stdin.buffer type=<class '_io.BufferedReader'>
+2026-04-23 23:39:31,263 [INFO] mcp_fin.server: mcp-fin-server: stdout type=<class '_io.TextIOWrapper'>, stdout.buffer type=<class '_io.FileIO'>
+2026-04-23 23:39:31,275 [INFO] mcp_fin.server: mcp-fin-server: stdio connected
+2026-04-23 23:39:31,275 [INFO] mcp_fin.server: mcp-fin-server: DIAG_BLOCK waiting before app.run (up to 20s)
+2026-04-23 23:39:51,280 [INFO] mcp_fin.server: mcp-fin-server: DIAG_BLOCK timeout reached; continuing to app.run
+2026-04-23 23:39:51,280 [INFO] mcp_fin.server: mcp-fin-server: launching app.run
+2026-04-23 23:39:51,293 [INFO] mcp.server.lowlevel.server: Processing request of type ListToolsRequest
