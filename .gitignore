@@ -1,0 +1,38 @@
+# ── Secrets & environment ────────────────────────────────────────
+.env
+.env.*
+!.env.example
+
+# ── rclone config (may contain tokens) ───────────────────────────
+rclone.conf
+
+# ── Nanobot workspace & memory (user data) ───────────────────────
+.nanobot/
+workspace/
+
+# ── Python / Node caches ─────────────────────────────────────────
+__pycache__/
+*.pyc
+*.pyo
+node_modules/
+package-lock.json
+yarn.lock
+
+# ── Docker overrides ─────────────────────────────────────────────
+docker-compose.override.yml
+
+# ── Logs ─────────────────────────────────────────────────────────
+*.log
+logs/
+
+# ── OS files ─────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+ desktop.ini
+
+# ── IDE / Editor ─────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~

@@ -5,6 +5,7 @@ services:
     plan: free
     region: singapore
     envVars:
+      # ── Core secrets ───────────────────────────────────────────
       - key: TELEGRAM_TOKEN
         sync: false
       - key: NVIDIA_API_KEY
@@ -15,3 +16,23 @@ services:
         sync: false
       - key: PORT
         value: "10000"
+
+      # ── Email channel (uncomment & fill in to enable) ──────────
+      # See .env.example for the full list of optional e‑mail vars.
+      # Only IMAP_HOST, IMAP_USERNAME, IMAP_PASSWORD,
+      #        SMTP_HOST, SMTP_USERNAME, SMTP_PASSWORD are required.
+      #
+      # - key: IMAP_HOST
+      #   value: ""
+      # - key: IMAP_USERNAME
+      #   value: ""
+      # - key: IMAP_PASSWORD
+      #   sync: false
+      # - key: SMTP_HOST
+      #   value: ""
+      # - key: SMTP_USERNAME
+      #   value: ""
+      # - key: SMTP_PASSWORD
+      #   sync: false
+      # - key: FROM_ADDRESS
+      #   value: ""
