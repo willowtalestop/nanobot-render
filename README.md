@@ -46,12 +46,50 @@ All configuration is driven by environment variables – no need to rebuild the 
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `NANOBOT_MODEL` | ✅ | Model identifier (default: `google/gemini-2.0-flash`) |
+| `NANOBOT_MODEL` | | Model identifier — defaults depend on active provider (see below) |
 | `TELEGRAM_TOKEN` | ✅ | Telegram bot token from [@BotFather](https://t.me/BotFather) |
-| `OPENROUTER_API_KEY` | ✅ | OpenRouter API key (sign up at https://openrouter.ai/) |
+| `OPENROUTER_API_KEY` | * | OpenRouter API key — [sign up at https://openrouter.ai/](https://openrouter.ai/) |
+| `NVIDIA_API_KEY` | * | NVIDIA NIM / NeMo API key — [get one at https://build.nvidia.com/](https://build.nvidia.com/) |
 | `PORT` | ✅ | Health‑check / dashboard port (default: `10000`) |
 
-> **Note:** This deployment uses **OpenRouter** as the sole LLM provider. NVIDIA NIM is no longer supported. See the [OpenRouter model catalog](https://openrouter.ai/models) for available models.
+> **How it works:** The container auto‑detects which provider to use.
+> - If `OPENROUTER_API_KEY` is set → **OpenRouter** (default model: `google/gemini-2.0-flash`)
+> - If `NVIDIA_API_KEY` is set → **NVIDIA NIM** (default model: `minimaxai/minimax-m2.7`)
+> - If both are set → **OpenRouter wins** (with a warning in the logs)
+> - If neither is set → **container refuses to start** with a clear error message
+>
+> Override the default model by setting `NANOBOT_MODEL` to any model supported by the active provider.
+
+### Provider quick reference
+
+| Provider | Default model | API key variable | Where to get a key |
+|----------|---------------|------------------|--------------------|
+| OpenRouter | `google/gemini-2.0-flash` | `OPENROUTER_API_KEY` | https://openrouter.ai/ |
+| NVIDIA NIM | `minimaxai/minimax-m2.7` | `NVIDIA_API_KEY` | https://build.nvidia.com/ |
+
+### Switching providers
+
+1. Open your `.env` file (or Render environment settings).
+2. **Set the API key** for the provider you want to use (`OPENROUTER_API_KEY` or `NVIDIA_API_KEY`).
+3. **Remove or clear** the key for the other provider (optional — the active provider's key takes precedence).
+4. Optionally change `NANOBOT_MODEL` to a compatible model for the new provider.
+5. Rebuild and redeploy:
+   ```bash
+   docker build -t automatte-nanobot .
+   docker run -d --env-file .env -p 10000:10000 automatte-nanobot
+   ```
+
+### Using a specific provider's env file (local dev only)
+
+Two ready‑made env files are provided:
+
+```bash
+# NVIDIA NIM
+cp .env.example.nvidia .env
+
+# OpenRouter
+cp .env.example.openrouter .env
+```
 
 ### Email Channel (optional)
 

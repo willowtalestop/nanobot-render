@@ -28,29 +28,45 @@ COPY <<'EOF' /home/user/app/start.sh
 #!/bin/bash
 set -e
 
-# ── model selection (OpenRouter) ────────────────────────────────────
-# NANOBOT_MODEL controls which model OpenRouter routes to.
-# Default: google/gemini-2.0-flash (low cost, fast)
-CURRENT_MODEL="${NANOBOT_MODEL:-google/gemini-2.0-flash}"
+# ── Auto-detect LLM provider ────────────────────────────────────────
+# If OPENROUTER_API_KEY is set → use OpenRouter
+# If NVIDIA_API_KEY is set → use NVIDIA NIM (OpenAI-compatible)
+# Error if neither is set; warn if both are set (OpenRouter wins).
 
-# ── LLM provider: OpenRouter ────────────────────────────────────────
-# OpenRouter is the sole supported provider (NVIDIA NIM removed).
-PROVIDER_API_BASE="https://openrouter.ai/api/v1"
+if [ -n "${OPENROUTER_API_KEY}" ] && [ -n "${NVIDIA_API_KEY}" ]; then
+  echo "⚠️  Both OPENROUTER_API_KEY and NVIDIA_API_KEY are set."
+  echo "   OpenRouter takes precedence. Set only one to avoid confusion."
+fi
 
-if [ -z "${OPENROUTER_API_KEY}" ]; then
-  echo "❌ ERROR: OPENROUTER_API_KEY is not set"
-  echo "   Sign up at https://openrouter.ai/ and set OPENROUTER_API_KEY in your env"
+if [ -n "${OPENROUTER_API_KEY}" ]; then
+  PROVIDER_NAME="openrouter"
+  PROVIDER_API_KEY="${OPENROUTER_API_KEY}"
+  PROVIDER_API_BASE="https://openrouter.ai/api/v1"
+  CURRENT_MODEL="${NANOBOT_MODEL:-google/gemini-2.0-flash}"
+  echo "🔀 Detected: OpenRouter (model: ${CURRENT_MODEL})"
+elif [ -n "${NVIDIA_API_KEY}" ]; then
+  PROVIDER_NAME="openai"
+  PROVIDER_API_KEY="${NVIDIA_API_KEY}"
+  PROVIDER_API_BASE="https://integrate.api.nvidia.com/v1"
+  CURRENT_MODEL="${NANOBOT_MODEL:-minimaxai/minimax-m2.7}"
+  echo "🔀 Detected: NVIDIA NIM (model: ${CURRENT_MODEL})"
+else
+  echo "❌ ERROR: No API key found."
+  echo "   Set either OPENROUTER_API_KEY or NVIDIA_API_KEY in your environment."
+  echo "   OpenRouter: https://openrouter.ai/"
+  echo "   NVIDIA NIM: https://build.nvidia.com/"
   exit 1
 fi
-echo "🔀 Using OpenRouter as LLM provider (model: ${CURRENT_MODEL})"
 
-# ── DEBUG: dump env vars for troubleshooting ────────────────────
+# ── DEBUG: environment summary ────────────────────────────────────
 echo "--- Environment summary ---"
-echo "  NANOBOT_MODEL      = ${CURRENT_MODEL}"
-echo "  OPENROUTER_API_KEY = ${OPENROUTER_API_KEY:0:8}***"
-echo "  PROVIDER_API_BASE  = ${PROVIDER_API_BASE}"
-echo "  TELEGRAM_TOKEN     = ${TELEGRAM_TOKEN:0:10}***"
-echo "  PORT               = ${PORT:-10000}"
+echo "  PROVISIONER      = ${PROVIDER_NAME}"
+echo "  MODEL            = ${CURRENT_MODEL}"
+echo "  OPENROUTER_KEY   = ${OPENROUTER_API_KEY:-<not set>}"
+echo "  NVIDIA_KEY       = ${NVIDIA_API_KEY:-<not set>}"
+echo "  PROVIDER_BASE    = ${PROVIDER_API_BASE}"
+echo "  TELEGRAM_TOKEN   = ${TELEGRAM_TOKEN:0:10}***"
+echo "  PORT             = ${PORT:-10000}"
 echo "---------------------------"
 
 # ── static HTML dashboard ────────────────────────────────────────
@@ -69,6 +85,7 @@ cat <<HTML > /home/user/app/index.html
     .pulse{width:8px;height:8px;background:#3fb950;border-radius:50%;margin-right:8px;animation:pulse 2s infinite}
     @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(63,185,80,.7)}70%{box-shadow:0 0 0 10px rgba(63,185,80,0)}100%{box-shadow:0 0 0 0 rgba(63,185,80,0)}}
     .model-info{background:#0d1117;padding:1rem;border-radius:8px;font-family:monospace;font-size:.85rem;color:#79c0ff;border:1px solid #30363d;word-break:break-all}
+    .provider-info{background:#0d1117;padding:1rem;border-radius:8px;font-family:monospace;font-size:.75rem;color:#79c0ff;border:1px solid #30363d;word-break:break-all;margin-top:0.5rem}
     .footer{margin-top:2rem;font-size:.75rem;color:#484f58}
   </style>
 </head>
@@ -80,6 +97,10 @@ cat <<HTML > /home/user/app/index.html
     <div class="model-info">
       <div style="font-size:.65rem;color:#8b949e;margin-bottom:4px;text-transform:uppercase">Active Engine</div>
       ${CURRENT_MODEL}
+    </div>
+    <div class="provider-info">
+      <div style="font-size:.65rem;color:#8b949e;margin-bottom:4px;text-transform:uppercase">Provider</div>
+      ${PROVIDER_API_BASE}
     </div>
     <div class="footer">&copy; 2026 Automatte Asia</div>
   </div>
@@ -99,17 +120,22 @@ fi
 mkdir -p /home/user/.nanobot/workspace/memory
 
 # ── build config.json ────────────────────────────────────────────
-# Base structure (always present)
+# Both provider configs are always present — the active one is
+# determined by the "provider" key under "agents.defaults".
 cat > /home/user/.nanobot/config.json <<CONF
 {
   "agents": {
     "defaults": {
       "workspace": "/home/user/.nanobot/workspace",
       "model": "${CURRENT_MODEL}",
-      "provider": "${LLM_PROVIDER}"
+      "provider": "${PROVIDER_NAME}"
     }
   },
   "providers": {
+    "openai": {
+      "apiKey": "${NVIDIA_API_KEY}",
+      "apiBase": "https://integrate.api.nvidia.com/v1"
+    },
     "openrouter": {
       "apiKey": "${OPENROUTER_API_KEY}",
       "apiBase": "https://openrouter.ai/api/v1"

@@ -4,21 +4,27 @@ services:
     runtime: docker
     plan: free
     region: singapore
-envVars:
-       # ── Core secrets ───────────────────────────────────────────
-       - key: TELEGRAM_TOKEN
-         sync: false
-       - key: OPENROUTER_API_KEY
-         sync: false
-       - key: NANOBOT_MODEL
-         value: "google/gemini-2.0-flash"
-       - key: RCLONE_CONFIG_BASE64
-         sync: false
-       - key: PORT
-         value: "10000"
+    envVars:
+      # ── Core secrets ───────────────────────────────────────────
+      # Provide ONE or the other (or both — OpenRouter takes precedence):
+      - key: NVIDIA_API_KEY
+        sync: false
+      - key: OPENROUTER_API_KEY
+        sync: false
+      # ── Optional: override the auto-detected default model ──────
+      - key: NANOBOT_MODEL
+        value: ""               # leave blank to use the provider's default
+      # ── Standard ───────────────────────────────────────────────
+      - key: TELEGRAM_TOKEN
+        sync: false
+      - key: RCLONE_CONFIG_BASE64
+        sync: false
+      - key: PORT
+        value: "10000"
 
       # ── Email channel (uncomment & fill in to enable) ──────────
-      # See .env.example for the full list of optional e‑mail vars.
+      # See .env.example.nvidia or .env.example.openrouter for the
+      # full list of optional e‑mail vars.
       # Only IMAP_HOST, IMAP_USERNAME, IMAP_PASSWORD,
       #        SMTP_HOST, SMTP_USERNAME, SMTP_PASSWORD are required.
       #
