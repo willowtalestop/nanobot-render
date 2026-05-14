@@ -46,42 +46,14 @@ All configuration is driven by environment variables – no need to rebuild the 
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `NANOBOT_MODEL` | ✅ | Model identifier (default: `minimaxai/minimax-m2.7`) |
+| `NANOBOT_MODEL` | ✅ | Model identifier (default: `google/gemini-2.0-flash`) |
 | `TELEGRAM_TOKEN` | ✅ | Telegram bot token from [@BotFather](https://t.me/BotFather) |
-| `LLM_PROVIDER` | | LLM provider: `nvidia` or `openrouter` (default: `nvidia`) |
-| `NVIDIA_API_KEY` | * | NVIDIA NIM / NeMo API key (required when `LLM_PROVIDER=nvidia`) |
-| `OPENROUTER_API_KEY` | * | OpenRouter API key (required when `LLM_PROVIDER=openrouter`) |
+| `OPENROUTER_API_KEY` | ✅ | OpenRouter API key (sign up at https://openrouter.ai/) |
 | `PORT` | ✅ | Health‑check / dashboard port (default: `10000`) |
 
-> **Note:** Only one API key is needed at a time — set `LLM_PROVIDER` to choose which one is active. If you switch providers, just change `LLM_PROVIDER` and restart the container.
+> **Note:** This deployment uses **OpenRouter** as the sole LLM provider. NVIDIA NIM is no longer supported. See the [OpenRouter model catalog](https://openrouter.ai/models) for available models.
 
-### Switching providers
-
-1. Open your `.env` file.
-2. Set `LLM_PROVIDER` to `nvidia` or `openrouter`.
-3. Provide the matching API key (`NVIDIA_API_KEY` or `OPENROUTER_API_KEY`).
-4. Rebuild and redeploy:
-   ```bash
-   docker build -t automatte-nanobot .
-   docker run -d --env-file .env -p 10000:10000 automatte-nanobot
-   ```
-
-### OpenRouter
-
-[OpenRouter](https://openrouter.ai/) provides a unified API that routes requests to many models (Claude, GPT‑4, Gemini, Llama, etc.). To use it:
-
-1. Sign up at https://openrouter.ai/ and get your API key from the dashboard.
-2. Set `LLM_PROVIDER=openrouter` and `OPENROUTER_API_KEY=<your-key>` in your `.env`.
-3. Set `NANOBOT_MODEL` to any model available on OpenRouter (default: `google/gemini-2.0-flash`).
-
-### Provider default models
-
-| Provider | Default model |
-|----------|---------------|
-| NVIDIA NIM | `minimaxai/minimax-m2.7` |
-| OpenRouter | `google/gemini-2.0-flash` |
-
-Override either default by explicitly setting `NANOBOT_MODEL` in your `.env`.
+### Email Channel (optional)
 
 ### Switching providers
 

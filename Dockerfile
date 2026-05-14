@@ -28,52 +28,29 @@ COPY <<'EOF' /home/user/app/start.sh
 #!/bin/bash
 set -e
 
-# ── model selection ──────────────────────────────────────────────
-# Default model depends on provider if NANOBOT_MODEL is unset:
-#   nvidia   → minimaxai/minimax-m2.7
-#   openrouter → google/gemini-2.0-flash
-if [ "$LLM_PROVIDER" = "openrouter" ]; then
-  CURRENT_MODEL="${NANOBOT_MODEL:-google/gemini-2.0-flash}"
-else
-  CURRENT_MODEL="${NANOBOT_MODEL:-minimaxai/minimax-m2.7}"
+# ── model selection (OpenRouter) ────────────────────────────────────
+# NANOBOT_MODEL controls which model OpenRouter routes to.
+# Default: google/gemini-2.0-flash (low cost, fast)
+CURRENT_MODEL="${NANOBOT_MODEL:-google/gemini-2.0-flash}"
+
+# ── LLM provider: OpenRouter ────────────────────────────────────────
+# OpenRouter is the sole supported provider (NVIDIA NIM removed).
+PROVIDER_API_BASE="https://openrouter.ai/api/v1"
+
+if [ -z "${OPENROUTER_API_KEY}" ]; then
+  echo "❌ ERROR: OPENROUTER_API_KEY is not set"
+  echo "   Sign up at https://openrouter.ai/ and set OPENROUTER_API_KEY in your env"
+  exit 1
 fi
-
-# ── LLM provider selection ───────────────────────────────────────
-# Supported: nvidia, openrouter (default: nvidia)
-LLM_PROVIDER="${LLM_PROVIDER:-nvidia}"
-
-if [ "$LLM_PROVIDER" = "openrouter" ]; then
-  PROVIDER_API_KEY="${OPENROUTER_API_KEY}"
-  PROVIDER_API_BASE="https://openrouter.ai/api/v1"
-  echo "🔀 Using OpenRouter as LLM provider (model: ${CURRENT_MODEL})"
-
-  if [ -z "${OPENROUTER_API_KEY}" ]; then
-    echo "❌ ERROR: LLM_PROVIDER=openrouter but OPENROUTER_API_KEY is not set"
-    echo "   Sign up at https://openrouter.ai/ and set OPENROUTER_API_KEY in your env"
-    exit 1
-  fi
-else
-  PROVIDER_API_KEY="${NVIDIA_API_KEY}"
-  PROVIDER_API_BASE="https://integrate.api.nvidia.com/v1"
-  echo "🔀 Using NVIDIA NIM as LLM provider (model: ${CURRENT_MODEL})"
-
-  if [ -z "${NVIDIA_API_KEY}" ]; then
-    echo "❌ ERROR: NVIDIA_API_KEY is not set"
-    echo "   Get your key from https://build.nvidia.com/ and set NVIDIA_API_KEY in your env"
-    exit 1
-  fi
-fi
+echo "🔀 Using OpenRouter as LLM provider (model: ${CURRENT_MODEL})"
 
 # ── DEBUG: dump env vars for troubleshooting ────────────────────
 echo "--- Environment summary ---"
-echo "  NANOBOT_MODEL     = ${CURRENT_MODEL}"
-echo "  LLM_PROVIDER      = ${LLM_PROVIDER}"
-echo "  NVIDIA_API_KEY    = ${NVIDIA_API_KEY:-<not set>}"
-echo "  OPENROUTER_API_KEY= ${OPENROUTER_API_KEY:-<not set>}"
-echo "  PROVIDER_API_KEY  = ${PROVIDER_API_KEY:-<not set>}"
-echo "  PROVIDER_API_BASE = ${PROVIDER_API_BASE:-<not set>}"
-echo "  TELEGRAM_TOKEN    = ${TELEGRAM_TOKEN:0:10}***"
-echo "  PORT              = ${PORT:-10000}"
+echo "  NANOBOT_MODEL      = ${CURRENT_MODEL}"
+echo "  OPENROUTER_API_KEY = ${OPENROUTER_API_KEY:0:8}***"
+echo "  PROVIDER_API_BASE  = ${PROVIDER_API_BASE}"
+echo "  TELEGRAM_TOKEN     = ${TELEGRAM_TOKEN:0:10}***"
+echo "  PORT               = ${PORT:-10000}"
 echo "---------------------------"
 
 # ── static HTML dashboard ────────────────────────────────────────
@@ -133,10 +110,6 @@ cat > /home/user/.nanobot/config.json <<CONF
     }
   },
   "providers": {
-    "nvidia": {
-      "apiKey": "${NVIDIA_API_KEY}",
-      "apiBase": "https://integrate.api.nvidia.com/v1"
-    },
     "openrouter": {
       "apiKey": "${OPENROUTER_API_KEY}",
       "apiBase": "https://openrouter.ai/api/v1"
