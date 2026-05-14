@@ -162,6 +162,7 @@ if [ -n "${IMAP_HOST}" ] && [ -n "${IMAP_USERNAME}" ] && [ -n "${IMAP_PASSWORD}"
 {
   "enabled": true,
   "consentGranted": true,
+  "allowFrom": ${ALLOWED_SENDERS:-["*"]},
   "imapHost": "${IMAP_HOST}",
   "imapPort": ${IMAP_PORT:-993},
   "imapUsername": "${IMAP_USERNAME}",
