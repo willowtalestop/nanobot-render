@@ -199,8 +199,10 @@ else
   echo "ℹ️  No e‑mail env vars supplied – e‑mail channel stays disabled."
 fi
 
-echo "Gateway initialized with ${CURRENT_MODEL}"
-exec nanobot gateway
+echo "--- Generated config.json ---"
+cat /home/user/.nanobot/config.json
+echo ""
+exec nanobot gateway 2>&1 | tee /tmp/gateway.log
 EOF
 
 RUN chmod +x /home/user/app/start.sh && chown -R user:user /home/user
