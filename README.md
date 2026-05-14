@@ -72,52 +72,28 @@ All configuration is driven by environment variables – no need to rebuild the 
 
 1. Sign up at https://openrouter.ai/ and get your API key from the dashboard.
 2. Set `LLM_PROVIDER=openrouter` and `OPENROUTER_API_KEY=<your-key>` in your `.env`.
-3. Optionally change `NANOBOT_MODEL` to any model available on OpenRouter (e.g., `google/gemini-2.0-flash`).
+3. Set `NANOBOT_MODEL` to any model available on OpenRouter (default: `google/gemini-2.0-flash`).
 
-### Email Channel (optional)
+### Provider default models
 
-> **Note:** Email requires a **Gmail App Password** (not your regular Google password).  
-> Generate one at: **Google Account → Security → App passwords**
+| Provider | Default model |
+|----------|---------------|
+| NVIDIA NIM | `minimaxai/minimax-m2.7` |
+| OpenRouter | `google/gemini-2.0-flash` |
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `IMAP_HOST` | ✅ | IMAP server (Gmail: `imap.gmail.com`) |
-| `IMAP_USERNAME` | ✅ | Email address |
-| `IMAP_PASSWORD` | ✅ | App password |
-| `IMAP_PORT` | | IMAP port (default: `993`) |
-| `IMAP_MAILBOX` | | Mailbox to poll (default: `INBOX`) |
-| `IMAP_USE_SSL` | | Use SSL for IMAP (default: `true`) |
-| `SMTP_HOST` | ✅ | SMTP server (Gmail: `smtp.gmail.com`) |
-| `SMTP_USERNAME` | ✅ | Email address |
-| `SMTP_PASSWORD` | ✅ | App password |
-| `SMTP_PORT` | | SMTP port (default: `587`) |
-| `SMTP_USE_TLS` | | Use STARTTLS (default: `true`) |
-| `SMTP_USE_SSL` | | Use SSL for SMTP (default: `false`) |
-| `FROM_ADDRESS` | | Sender address shown in replies |
-| `AUTO_REPLY_ENABLED` | | Auto‑reply to inbound mail (default: `true`) |
-| `POLL_INTERVAL` | | Seconds between IMAP polls (default: `30`) |
-| `VERIFY_DKIM` | | Enforce DKIM verification (default: `true`) |
-| `VERIFY_SPF` | | Enforce SPF verification (default: `true`) |
-| `ALLOWED_ATTACHMENT_TYPES` | | MIME types to allow (default: all `["*"]`) |
-| `MAX_ATTACHMENT_SIZE` | | Max attachment size in bytes (default: `2000000`) |
-| `MAX_ATTACHMENTS_PER_EMAIL` | | Max attachments per message (default: `5`) |
+Override either default by explicitly setting `NANOBOT_MODEL` in your `.env`.
 
-### rclone (optional)
+### Switching providers
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `RCLONE_CONFIG_BASE64` | | Base64‑encoded rclone config for cloud storage backup |
-
-To generate the base64 string:
-
-```powershell
-# PowerShell
-[System.Convert]::ToBase64String(
-    [System.Text.Encoding]::UTF8.GetBytes(
-        Get-Content -Raw -Path "rclone.conf"
-    )
-)
-```
+1. Open your `.env` file.
+2. Set `LLM_PROVIDER` to `nvidia` or `openrouter`.
+3. Provide the matching API key (`NVIDIA_API_KEY` or `OPENROUTER_API_KEY`).
+4. If switching to OpenRouter, consider changing `NANOBOT_MODEL` to a compatible model (e.g. `google/gemini-2.0-flash`).
+5. Rebuild and redeploy:
+   ```bash
+   docker build -t automatte-nanobot .
+   docker run -d --env-file .env -p 10000:10000 automatte-nanobot
+   ```
 
 ---
 

@@ -29,7 +29,14 @@ COPY <<'EOF' /home/user/app/start.sh
 set -e
 
 # ── model selection ──────────────────────────────────────────────
-CURRENT_MODEL="${NANOBOT_MODEL:-minimaxai/minimax-m2.7}"
+# Default model depends on provider if NANOBOT_MODEL is unset:
+#   nvidia   → minimaxai/minimax-m2.7
+#   openrouter → google/gemini-2.0-flash
+if [ "$LLM_PROVIDER" = "openrouter" ]; then
+  CURRENT_MODEL="${NANOBOT_MODEL:-google/gemini-2.0-flash}"
+else
+  CURRENT_MODEL="${NANOBOT_MODEL:-minimaxai/minimax-m2.7}"
+fi
 
 # ── LLM provider selection ───────────────────────────────────────
 # Supported: nvidia, openrouter (default: nvidia)
@@ -38,11 +45,11 @@ LLM_PROVIDER="${LLM_PROVIDER:-nvidia}"
 if [ "$LLM_PROVIDER" = "openrouter" ]; then
   PROVIDER_API_KEY="${OPENROUTER_API_KEY}"
   PROVIDER_API_BASE="https://openrouter.ai/api/v1"
-  echo "🔀 Using OpenRouter as LLM provider"
+  echo "🔀 Using OpenRouter as LLM provider (model: ${CURRENT_MODEL})"
 else
   PROVIDER_API_KEY="${NVIDIA_API_KEY}"
   PROVIDER_API_BASE="https://integrate.api.nvidia.com/v1"
-  echo "🔀 Using NVIDIA NIM as LLM provider (default)"
+  echo "🔀 Using NVIDIA NIM as LLM provider (model: ${CURRENT_MODEL})"
 fi
 
 # ── static HTML dashboard ────────────────────────────────────────
