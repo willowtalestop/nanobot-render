@@ -31,6 +31,20 @@ set -e
 # ── model selection ──────────────────────────────────────────────
 CURRENT_MODEL="${NANOBOT_MODEL:-minimaxai/minimax-m2.7}"
 
+# ── LLM provider selection ───────────────────────────────────────
+# Supported: nvidia, openrouter (default: nvidia)
+LLM_PROVIDER="${LLM_PROVIDER:-nvidia}"
+
+if [ "$LLM_PROVIDER" = "openrouter" ]; then
+  PROVIDER_API_KEY="${OPENROUTER_API_KEY}"
+  PROVIDER_API_BASE="https://openrouter.ai/api/v1"
+  echo "🔀 Using OpenRouter as LLM provider"
+else
+  PROVIDER_API_KEY="${NVIDIA_API_KEY}"
+  PROVIDER_API_BASE="https://integrate.api.nvidia.com/v1"
+  echo "🔀 Using NVIDIA NIM as LLM provider (default)"
+fi
+
 # ── static HTML dashboard ────────────────────────────────────────
 cat <<HTML > /home/user/app/index.html
 <!DOCTYPE html>
@@ -84,13 +98,17 @@ cat > /home/user/.nanobot/config.json <<CONF
     "defaults": {
       "workspace": "/home/user/.nanobot/workspace",
       "model": "${CURRENT_MODEL}",
-      "provider": "openai"
+      "provider": "${LLM_PROVIDER}"
     }
   },
   "providers": {
-    "openai": {
+    "nvidia": {
       "apiKey": "${NVIDIA_API_KEY}",
       "apiBase": "https://integrate.api.nvidia.com/v1"
+    },
+    "openrouter": {
+      "apiKey": "${OPENROUTER_API_KEY}",
+      "apiBase": "https://openrouter.ai/api/v1"
     }
   },
   "channels": {
