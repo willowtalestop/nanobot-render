@@ -12,8 +12,8 @@ services:
         sync: false
       - key: OPENROUTER_API_KEY
         sync: false
-      - key: LLM_PROVIDER
-        value: "nvidia"
+- key: LLM_PROVIDER
+          value: "openrouter"
       - key: NANOBOT_MODEL
         value: "minimaxai/minimax-m2.7" # Switched to MiniMax for speed
       - key: RCLONE_CONFIG_BASE64
